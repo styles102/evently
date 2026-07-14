@@ -1,6 +1,7 @@
 import { afterAll, describe, expect, it } from 'vitest'
 import { like } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
+import { requireUser } from '@/server/auth'
 import { db } from '@/db'
 import { user } from '@/db/schema'
 
@@ -94,5 +95,36 @@ describe('duplicate email', () => {
       statusCode: 422,
       body: { message: expect.stringMatching(/already exists/i) },
     })
+  })
+})
+
+describe('requireUser (session-required operations)', () => {
+  it('refuses anonymous callers', async () => {
+    await expect(requireUser(new Headers())).rejects.toMatchObject({
+      message: expect.stringMatching(/signed in/i),
+    })
+  })
+
+  it('returns the signed-in user when called with a valid session cookie', async () => {
+    await auth.api.signUpEmail({
+      body: {
+        name: 'Erin',
+        email: emailFor('erin'),
+        password: 'erins excellent password',
+      },
+    })
+    const { headers: responseHeaders } = await auth.api.signInEmail({
+      returnHeaders: true,
+      body: { email: emailFor('erin'), password: 'erins excellent password' },
+    })
+    const sessionCookie = (responseHeaders.get('set-cookie') ?? '').split(
+      ';',
+    )[0]
+
+    const signedInUser = await requireUser(
+      new Headers({ cookie: sessionCookie }),
+    )
+
+    expect(signedInUser.email).toBe(emailFor('erin'))
   })
 })
