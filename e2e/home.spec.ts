@@ -1,7 +1,8 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, waitForHydration } from './fixtures'
 
 test('home page shows the seeded Categories', async ({ page }) => {
   await page.goto('/')
+  await waitForHydration(page)
 
   await expect(
     page.getByRole('heading', { name: 'Evently' }),
