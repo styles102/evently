@@ -13,7 +13,14 @@ import * as schema from '@/db/schema'
  */
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL ?? 'http://localhost:3000',
-  secret: process.env.BETTER_AUTH_SECRET ?? 'evently-dev-only-secret-change-me',
+  // The dev fallback must not reach production: better-auth only throws on
+  // *its own* default secret, so an unconditional fallback here would mask a
+  // missing BETTER_AUTH_SECRET in a real deployment.
+  secret:
+    process.env.BETTER_AUTH_SECRET ??
+    (process.env.NODE_ENV === 'production'
+      ? undefined
+      : 'evently-dev-only-secret-change-me'),
   database: drizzleAdapter(db, { provider: 'pg', schema }),
   emailAndPassword: {
     enabled: true,

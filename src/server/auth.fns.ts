@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 import { getRequestHeaders } from '@tanstack/react-start/server'
-import { currentSession } from './auth'
+import { publicSession } from './auth'
 
 /**
  * Delegate-only server functions — the client-safe face of the auth seam.
@@ -10,5 +10,5 @@ import { currentSession } from './auth'
  * only RPC stubs, keeping better-auth/pg/dotenv out of the browser.
  */
 export const getSessionServerFn = createServerFn({ method: 'GET' }).handler(
-  () => currentSession(getRequestHeaders()),
+  () => publicSession(getRequestHeaders()),
 )

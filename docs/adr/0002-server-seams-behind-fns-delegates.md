@@ -1,0 +1,5 @@
+# Server seams live behind *.fns.ts delegates
+
+TanStack Start's compiler extracts `createServerFn` handler *bodies* from the client bundle, but a module's other exports keep its whole import graph alive in the client transform. Slice 1 co-located the plain seam handler and its server-function wrapper in one file, which dragged pg/dotenv/better-auth into the browser and crashed hydration on every page (latent until slice 2 added interactivity). Seam handlers — plain functions, integration-tested against real Postgres — therefore live in server-only modules (`src/server/x.ts`), and routes import only their delegate-only siblings (`src/server/x.fns.ts`), whose handler bodies the compiler strips to RPC stubs.
+
+Chosen over `serverOnly()` wrappers and dynamic imports because it keeps Vitest at the seam with no runtime indirection. The `x()`/`xServerFn` naming pair stays greppable; the boundary is enforced by `tests/import-boundaries.test.ts`. Data crossing a `*.fns.ts` seam must be shaped to what the UI needs — never raw better-auth/DB payloads (the root loader dehydrates its result into every page's HTML).

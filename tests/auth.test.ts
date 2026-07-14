@@ -102,6 +102,7 @@ describe('requireUser (session-required operations)', () => {
   it('refuses anonymous callers', async () => {
     await expect(requireUser(new Headers())).rejects.toMatchObject({
       message: expect.stringMatching(/signed in/i),
+      status: 401,
     })
   })
 
