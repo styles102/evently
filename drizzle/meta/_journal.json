@@ -8,6 +8,13 @@
       "when": 1784027888043,
       "tag": "0000_wise_black_panther",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1784036277207,
+      "tag": "0001_yielding_blink",
+      "breakpoints": true
     }
   ]
 }
