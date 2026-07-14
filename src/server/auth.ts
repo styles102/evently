@@ -1,11 +1,13 @@
-import { createServerFn } from '@tanstack/react-start'
-import { getRequestHeaders } from '@tanstack/react-start/server'
 import { auth } from '@/lib/auth'
 
 /**
  * The session-read seam: resolves the better-auth session (or null) from
  * request headers. Integration tests call this directly; the app calls it
- * through `getSessionServerFn`.
+ * through `getSessionServerFn` (see `auth.fns.ts`).
+ *
+ * This module imports server-only code (better-auth, the db pool), so route
+ * files must never import it directly — only via the `*.fns.ts` delegates,
+ * whose handler bodies are stripped from the client bundle.
  */
 export async function currentSession(headers: Headers) {
   return auth.api.getSession({ headers })
@@ -22,7 +24,3 @@ export async function requireUser(headers: Headers) {
   }
   return session.user
 }
-
-export const getSessionServerFn = createServerFn({ method: 'GET' }).handler(
-  () => currentSession(getRequestHeaders()),
-)

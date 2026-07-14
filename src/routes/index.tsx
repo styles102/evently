@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { listCategoriesServerFn } from '@/server/categories'
+import { listCategoriesServerFn } from '@/server/categories.fns'
 
 export const Route = createFileRoute('/')({
   component: Home,
