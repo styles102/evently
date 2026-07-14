@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.output/
+.nitro/
+.tanstack/
+.vite/
+*.local
+.env
+test-results/
+playwright-report/
+src/routeTree.gen.ts

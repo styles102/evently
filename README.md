@@ -1,0 +1,69 @@
+# Evently
+
+An Eventbrite-style event platform: users publish Events and attend each other's Events. See `CONTEXT.md` for the domain glossary (Event, Category, Organizer, RSVP, Favorite, Attendee, Capacity, Cancelled).
+
+## Stack
+
+- [TanStack Start](https://tanstack.com/start) (React, file-based routing, server functions)
+- Tailwind v4 + [shadcn/ui](https://ui.shadcn.com) on Base UI
+- Postgres (Docker Compose) + Drizzle ORM
+- Vitest (server-function integration tests against real Postgres — no DB mocking)
+- Playwright (browser smoke tests)
+
+## Prerequisites
+
+- Node 22+
+- Docker (for Postgres)
+
+## Run steps
+
+```sh
+# 1. Install dependencies
+npm install
+
+# 2. Environment (defaults work with the compose file as-is)
+cp .env.example .env
+
+# 3. Start Postgres
+docker compose up -d
+
+# 4. Apply migrations
+npm run db:migrate
+
+# 5. Seed the fixed Category list (Music, Tech, Sports, Food, Arts, Business)
+npm run db:seed
+
+# 6. Start the dev server → http://localhost:3000
+npm run dev
+```
+
+## Tests
+
+Both suites hit the real Postgres from Docker Compose — run steps 3–5 first.
+
+```sh
+# Vitest integration tests (server-function seam)
+npm test
+
+# Playwright browser smoke (starts the dev server itself if not running)
+npx playwright install chromium   # first time only
+npm run test:e2e
+```
+
+## Database scripts
+
+| Script | What it does |
+| --- | --- |
+| `npm run db:generate` | Generate a new Drizzle migration from `src/db/schema.ts` |
+| `npm run db:migrate` | Apply pending migrations |
+| `npm run db:seed` | Insert the fixed Category list (idempotent) |
+
+## Project layout
+
+- `src/routes/` — file-based routes (`__root.tsx`, `index.tsx`)
+- `src/server/` — server functions, the app's only data boundary
+- `src/db/` — Drizzle client + schema; migrations live in `drizzle/`
+- `src/components/ui/` — shadcn/ui (Base UI) components
+- `tests/` — Vitest integration tests (server-function seam)
+- `e2e/` — Playwright smoke tests
+- `docs/adr/` — architecture decision records
